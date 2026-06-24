@@ -159,6 +159,16 @@ def load_state_for_resume(
     }
     checkpoint = repository.latest_checkpoint(config.job_id)
     virtual_window = checkpoint["virtual_window"] + 1 if checkpoint else 0
+    repository.record_event(
+        job_id=config.job_id,
+        event_type="job_resumed",
+        message="Simulation job resumed from checkpoint",
+        virtual_window=virtual_window,
+        details={
+            "queued_batches_count": len(queued),
+            "terminal_batches_count": len(terminal),
+        },
+    )
     return SimulationState(
         config=config,
         repository=repository,
@@ -392,6 +402,19 @@ def _save_checkpoint(state: SimulationState) -> None:
         {
             "queued_batches": [batch.batch_id for batch in state.queued_batches],
             "terminal_batches": list(state.terminal_batches),
+            "completed_work_items": completed,
+            "failed_work_items": failed,
+            "missing_outputs": missing,
+        },
+    )
+    state.repository.record_event(
+        job_id=state.config.job_id,
+        event_type="checkpoint_saved",
+        message="Scheduler checkpoint saved",
+        virtual_window=state.virtual_window,
+        details={
+            "queued_batches_count": len(state.queued_batches),
+            "terminal_batches_count": len(state.terminal_batches),
             "completed_work_items": completed,
             "failed_work_items": failed,
             "missing_outputs": missing,

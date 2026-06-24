@@ -5,6 +5,8 @@
 - Hardened recursive redaction for work-item metadata and scheduler event details.
 - Added job-config validation so planned batch hard caps must fit at least one quota lane.
 - Expanded regression coverage for hard-cap packing, dispatch-window lane assignment, failed-batch retry attempts, resume deduplication, and no-raw-text storage.
+- Added `job_resumed` and `checkpoint_saved` scheduler events.
+- Added comprehensive test coverage for resume/checkpoint behaviors ensuring queued/retry state, missing outputs, and completed batches are accurately handled across restarts.
 - Updated README and integration docs with the safe persistence and executor boundary contracts.
 
 ## 0.1.0 - Initial simulator slice
