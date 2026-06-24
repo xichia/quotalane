@@ -6,7 +6,9 @@ from rich.table import Table
 from quotalane.simulator.engine import SimulationResult
 
 
-def render_simulation_result(console: Console, result: SimulationResult, *, show_windows: bool = True) -> None:
+def render_simulation_result(
+    console: Console, result: SimulationResult, *, show_windows: bool = True
+) -> None:
     console.print("[bold]QuotaLane simulation[/bold]\n")
     summary = Table(show_header=False)
     summary.add_column("Metric")

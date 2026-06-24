@@ -20,10 +20,19 @@ def can_accept_batch(lane: QuotaLane, batch: Batch, virtual_window: int) -> bool
         return False
     if lane.requests_used_current_window + 1 > lane.requests_per_minute:
         return False
-    if lane.input_tokens_used_current_window + batch.estimated_input_tokens > lane.input_tokens_per_minute:
+    if (
+        lane.input_tokens_used_current_window + batch.estimated_input_tokens
+        > lane.input_tokens_per_minute
+    ):
         return False
-    if lane.daily_request_limit is not None and lane.requests_used_today + 1 > lane.daily_request_limit:
+    if (
+        lane.daily_request_limit is not None
+        and lane.requests_used_today + 1 > lane.daily_request_limit
+    ):
         return False
-    if lane.daily_token_limit is not None and lane.input_tokens_used_today + batch.estimated_input_tokens > lane.daily_token_limit:
+    if (
+        lane.daily_token_limit is not None
+        and lane.input_tokens_used_today + batch.estimated_input_tokens > lane.daily_token_limit
+    ):
         return False
     return True

@@ -101,7 +101,9 @@ def _new_job(config: JobConfig, db_path: Path, work_items: list[WorkItem]) -> Jo
     )
 
 
-def build_fresh_state(config: JobConfig, repository: SQLiteRepository, db_path: Path, *, reset: bool) -> SimulationState:
+def build_fresh_state(
+    config: JobConfig, repository: SQLiteRepository, db_path: Path, *, reset: bool
+) -> SimulationState:
     if reset:
         repository.reset()
     work_items_list = generate_fake_paragraph_work_items(config.simulation)
@@ -129,7 +131,9 @@ def build_fresh_state(config: JobConfig, repository: SQLiteRepository, db_path: 
     )
 
 
-def load_state_for_resume(config: JobConfig, repository: SQLiteRepository, db_path: Path) -> SimulationState:
+def load_state_for_resume(
+    config: JobConfig, repository: SQLiteRepository, db_path: Path
+) -> SimulationState:
     job = repository.get_job(config.job_id)
     if job is None:
         return build_fresh_state(config, repository, db_path, reset=False)
@@ -139,12 +143,19 @@ def load_state_for_resume(config: JobConfig, repository: SQLiteRepository, db_pa
     queued = [
         batch
         for batch in all_batches
-        if batch.status in {BatchStatus.queued, BatchStatus.pending, BatchStatus.retry_pending, BatchStatus.processing}
+        if batch.status
+        in {
+            BatchStatus.queued,
+            BatchStatus.pending,
+            BatchStatus.retry_pending,
+            BatchStatus.processing,
+        }
     ]
     terminal = {
         batch.batch_id: batch
         for batch in all_batches
-        if batch.status in {BatchStatus.completed, BatchStatus.failed, BatchStatus.partially_completed}
+        if batch.status
+        in {BatchStatus.completed, BatchStatus.failed, BatchStatus.partially_completed}
     }
     checkpoint = repository.latest_checkpoint(config.job_id)
     virtual_window = checkpoint["virtual_window"] + 1 if checkpoint else 0
@@ -233,7 +244,9 @@ async def _execute_window(state: SimulationState, executor: FakeBatchExecutor) -
         record.missing_outputs = len(result.missing_work_item_ids)
 
     for result in results:
-        _apply_result(state, batch_by_id[result.batch_id], lane_by_batch_id[result.batch_id], result)
+        _apply_result(
+            state, batch_by_id[result.batch_id], lane_by_batch_id[result.batch_id], result
+        )
 
     state.windows.append(dispatch_window)
     if state.config.checkpointing.enabled:
@@ -247,7 +260,9 @@ def _next_retry_batch_id(state: SimulationState) -> str:
     return batch_id
 
 
-def _apply_result(state: SimulationState, batch: Batch, lane: QuotaLane, result: BatchExecutionResult) -> None:
+def _apply_result(
+    state: SimulationState, batch: Batch, lane: QuotaLane, result: BatchExecutionResult
+) -> None:
     repo = state.repository
     lane_after = state.lanes[lane.lane_id]
     if result.status == BatchExecutionStatus.failed:
@@ -262,7 +277,9 @@ def _apply_result(state: SimulationState, batch: Batch, lane: QuotaLane, result:
             input_tokens=batch.estimated_input_tokens,
         )
         if should_retry_batch(failed_batch, state.config.retry.max_attempts):
-            retry_batch = mark_for_retry(failed_batch).model_copy(update={"status": BatchStatus.queued})
+            retry_batch = mark_for_retry(failed_batch).model_copy(
+                update={"status": BatchStatus.queued}
+            )
             state.queued_batches.append(retry_batch)
             repo.upsert_batches([retry_batch])
             repo.update_work_statuses(
@@ -276,7 +293,10 @@ def _apply_result(state: SimulationState, batch: Batch, lane: QuotaLane, result:
                 lane_id=lane.lane_id,
                 batch_id=batch.batch_id,
                 virtual_window=state.virtual_window,
-                details={"error_code": result.error_code, "attempt_count": failed_batch.attempt_count},
+                details={
+                    "error_code": result.error_code,
+                    "attempt_count": failed_batch.attempt_count,
+                },
             )
         else:
             state.terminal_batches[failed_batch.batch_id] = failed_batch
@@ -289,7 +309,9 @@ def _apply_result(state: SimulationState, batch: Batch, lane: QuotaLane, result:
         repo.upsert_lanes([state.lanes[lane.lane_id]])
         return
 
-    completed_statuses = {item_id: WorkStatus.completed for item_id in result.completed_work_item_ids}
+    completed_statuses = {
+        item_id: WorkStatus.completed for item_id in result.completed_work_item_ids
+    }
     if completed_statuses:
         repo.update_work_statuses(state.config.job_id, completed_statuses)
 
@@ -310,7 +332,10 @@ def _apply_result(state: SimulationState, batch: Batch, lane: QuotaLane, result:
             error_code=result.error_code,
             input_tokens=batch.estimated_input_tokens,
         )
-        if state.config.retry.requeue_missing_outputs and batch.attempt_count < state.config.retry.max_attempts:
+        if (
+            state.config.retry.requeue_missing_outputs
+            and batch.attempt_count < state.config.retry.max_attempts
+        ):
             retry_batch = create_missing_output_retry_batch(
                 parent_batch=batch,
                 missing_work_item_ids=result.missing_work_item_ids,
@@ -382,7 +407,11 @@ def _finalize(state: SimulationState) -> SimulationResult:
     all_batches = state.repository.list_batches(state.config.job_id)
     completed_batches = sum(1 for batch in all_batches if batch.status == BatchStatus.completed)
     failed_batches = sum(1 for batch in all_batches if batch.status == BatchStatus.failed)
-    final_status = JobStatus.completed if failed_items == 0 and not state.queued_batches else JobStatus.partially_completed
+    final_status = (
+        JobStatus.completed
+        if failed_items == 0 and not state.queued_batches
+        else JobStatus.partially_completed
+    )
     if failed_items and completed_items == 0:
         final_status = JobStatus.failed
 
@@ -442,7 +471,10 @@ async def run_simulation_async(
         await _execute_window(state, executor)
         windows_run += 1
         # If all lanes are permanently failed, stop rather than spinning forever.
-        if all(lane.state in {LaneState.failed, LaneState.disabled, LaneState.quota_exhausted} for lane in state.lanes.values()):
+        if all(
+            lane.state in {LaneState.failed, LaneState.disabled, LaneState.quota_exhausted}
+            for lane in state.lanes.values()
+        ):
             break
 
     return _finalize(state)
@@ -457,5 +489,7 @@ def run_simulation(
     max_windows: int | None = None,
 ) -> SimulationResult:
     return asyncio.run(
-        run_simulation_async(config, db_path=db_path, reset=reset, resume=resume, max_windows=max_windows)
+        run_simulation_async(
+            config, db_path=db_path, reset=reset, resume=resume, max_windows=max_windows
+        )
     )

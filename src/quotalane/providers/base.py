@@ -7,5 +7,4 @@ from quotalane.models.results import BatchExecutionResult
 
 
 class BatchExecutor(Protocol):
-    async def execute_batch(self, batch: Batch) -> BatchExecutionResult:
-        ...
+    async def execute_batch(self, batch: Batch) -> BatchExecutionResult: ...
