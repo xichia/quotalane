@@ -1,0 +1,66 @@
+job_id: paragraph_summary_large_demo
+job_type: paragraph_summary
+provider: gemini
+model: gemini-3.1-flash-lite
+
+lanes:
+  - lane_id: gemini_key_1
+    provider: gemini
+    model: gemini-3.1-flash-lite
+    api_key_env_name: GEMINI_API_KEY_1
+    requests_per_minute: 1
+    input_tokens_per_minute: 250000
+    safe_input_token_target: 225000
+    hard_input_token_cap: 240000
+
+  - lane_id: gemini_key_2
+    provider: gemini
+    model: gemini-3.1-flash-lite
+    api_key_env_name: GEMINI_API_KEY_2
+    requests_per_minute: 1
+    input_tokens_per_minute: 250000
+    safe_input_token_target: 225000
+    hard_input_token_cap: 240000
+
+  - lane_id: gemini_key_3
+    provider: gemini
+    model: gemini-3.1-flash-lite
+    api_key_env_name: GEMINI_API_KEY_3
+    requests_per_minute: 1
+    input_tokens_per_minute: 250000
+    safe_input_token_target: 225000
+    hard_input_token_cap: 240000
+
+  - lane_id: gemini_key_4
+    provider: gemini
+    model: gemini-3.1-flash-lite
+    api_key_env_name: GEMINI_API_KEY_4
+    requests_per_minute: 1
+    input_tokens_per_minute: 250000
+    safe_input_token_target: 225000
+    hard_input_token_cap: 240000
+
+batching:
+  preserve_input_order: true
+  max_items_per_batch: 500
+  safe_input_token_target: 225000
+  hard_input_token_cap: 240000
+  allow_safe_target_overflow: true
+
+retry:
+  max_attempts: 3
+  backoff_seconds: 60
+  requeue_missing_outputs: true
+
+checkpointing:
+  enabled: true
+  checkpoint_every_batches: 1
+
+simulation:
+  work_items: 9800
+  average_tokens_per_item: 690
+  token_jitter_ratio: 0.25
+  provider_latency_seconds: 2
+  fail_batch_ids: []
+  missing_output_ratio: 0.0
+  random_seed: 42
