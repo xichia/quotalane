@@ -87,4 +87,6 @@ class JobConfig(BaseModel):
 def load_job_config(path: str | Path) -> JobConfig:
     path = Path(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"Config file {path} must contain a YAML dictionary.")
     return JobConfig.model_validate(data)

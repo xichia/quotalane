@@ -1,4 +1,3 @@
-from quotalane.config.job_config import SimulationConfig
 from quotalane.simulator.engine import run_simulation
 from quotalane.storage.repositories import SQLiteRepository
 

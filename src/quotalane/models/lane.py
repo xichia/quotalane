@@ -42,7 +42,7 @@ class QuotaLane(BaseModel):
     failure_count: int = 0
     updated_at: datetime = Field(default_factory=utc_now)
 
-    def reset_window_if_needed(self, virtual_window: int) -> "QuotaLane":
+    def reset_window_if_needed(self, virtual_window: int) -> QuotaLane:
         if self.current_window == virtual_window:
             return self
         return self.model_copy(
@@ -54,7 +54,7 @@ class QuotaLane(BaseModel):
             }
         )
 
-    def mark_processing(self, batch_id: str) -> "QuotaLane":
+    def mark_processing(self, batch_id: str) -> QuotaLane:
         return self.model_copy(
             update={
                 "state": LaneState.processing,
@@ -63,7 +63,7 @@ class QuotaLane(BaseModel):
             }
         )
 
-    def mark_ready(self, virtual_window: int) -> "QuotaLane":
+    def mark_ready(self, virtual_window: int) -> QuotaLane:
         lane = self.reset_window_if_needed(virtual_window)
         return lane.model_copy(
             update={
@@ -74,7 +74,7 @@ class QuotaLane(BaseModel):
             }
         )
 
-    def mark_cooldown(self, until_window: int) -> "QuotaLane":
+    def mark_cooldown(self, until_window: int) -> QuotaLane:
         return self.model_copy(
             update={
                 "state": LaneState.cooldown,
@@ -84,7 +84,7 @@ class QuotaLane(BaseModel):
             }
         )
 
-    def mark_failed(self) -> "QuotaLane":
+    def mark_failed(self) -> QuotaLane:
         return self.model_copy(
             update={
                 "state": LaneState.failed,
@@ -94,7 +94,7 @@ class QuotaLane(BaseModel):
             }
         )
 
-    def record_request(self, tokens: int, virtual_window: int) -> "QuotaLane":
+    def record_request(self, tokens: int, virtual_window: int) -> QuotaLane:
         lane = self.reset_window_if_needed(virtual_window)
         return lane.model_copy(
             update={

@@ -56,6 +56,20 @@ The `WorkItem` model strips metadata keys that commonly contain raw text or prom
 
 Lane records may store API-key environment variable names, such as `GEMINI_API_KEY_1`, but not key values.
 
+## Architecture decisions
+
+### Why QuotaLane does not store raw text
+To maintain a strict data boundary, QuotaLane relies entirely on the client system for resolving text. Storing only hashes and structural IDs drastically reduces database footprint and removes the risk of leaking sensitive inputs, credentials, or prompts into the scheduler checkpoint tables.
+
+### Why simulated time is virtual
+Dispatch windows advance a "virtual minute" instead of sleeping a physical 60 seconds. This allows large-job simulation to complete deterministically in seconds, verifying packing logic, quotas, and state transitions without waiting for a real clock.
+
+### Why paragraph-summary-service owns provider calls
+QuotaLane is solely responsible for safely scheduling batches over time. Actual text loading, formatting, LLM I/O, cache reading/writing, and API calls are delegated to the host service to preserve separation of concerns.
+
+### Why QuotaLane remains provider-agnostic
+LLM APIs frequently change. By adhering to a simple `BatchExecutor` interface, QuotaLane handles any quota-limited workload without needing provider-specific SDK logic inside its core loop.
+
 ## Future integration
 
 `paragraph-summary-service` should import QuotaLane and implement a batch executor. QuotaLane should not import the service.
