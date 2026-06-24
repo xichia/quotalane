@@ -69,10 +69,8 @@ def pack_work_items(
         tokens = item.estimated_input_tokens
         if tokens > hard_input_token_cap:
             raise BatchPackingError(
-                
-                    f"work item {item.work_item_id} has {tokens} tokens, "
-                    f"above hard cap {hard_input_token_cap}"
-                
+                f"work item {item.work_item_id} has {tokens} tokens, "
+                f"above hard cap {hard_input_token_cap}"
             )
 
         would_exceed_hard = current_tokens + tokens > hard_input_token_cap
