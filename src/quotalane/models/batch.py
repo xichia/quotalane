@@ -38,7 +38,7 @@ class Batch(BaseModel):
     def size(self) -> int:
         return len(self.work_item_ids)
 
-    def assign(self, lane_id: str) -> "Batch":
+    def assign(self, lane_id: str) -> Batch:
         return self.model_copy(
             update={
                 "lane_id": lane_id,
@@ -48,12 +48,16 @@ class Batch(BaseModel):
             }
         )
 
-    def complete(self) -> "Batch":
+    def complete(self) -> Batch:
         return self.model_copy(
             update={"status": BatchStatus.completed, "completed_at": utc_now(), "error_code": None}
         )
 
-    def fail(self, error_code: str) -> "Batch":
+    def fail(self, error_code: str) -> Batch:
         return self.model_copy(
-            update={"status": BatchStatus.failed, "completed_at": utc_now(), "error_code": error_code}
+            update={
+                "status": BatchStatus.failed,
+                "completed_at": utc_now(),
+                "error_code": error_code,
+            }
         )

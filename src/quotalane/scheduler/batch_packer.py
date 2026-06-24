@@ -37,7 +37,11 @@ def pack_work_items(
     if max_items_per_batch <= 0:
         raise BatchPackingError("max_items_per_batch must be positive")
 
-    ordered_items = list(work_items) if preserve_input_order else sorted(work_items, key=lambda w: w.work_item_id)
+    ordered_items = (
+        list(work_items)
+        if preserve_input_order
+        else sorted(work_items, key=lambda w: w.work_item_id)
+    )
     batches: list[Batch] = []
     current_ids: list[str] = []
     current_tokens = 0
@@ -65,7 +69,10 @@ def pack_work_items(
         tokens = item.estimated_input_tokens
         if tokens > hard_input_token_cap:
             raise BatchPackingError(
-                f"work item {item.work_item_id} has {tokens} tokens, above hard cap {hard_input_token_cap}"
+                
+                    f"work item {item.work_item_id} has {tokens} tokens, "
+                    f"above hard cap {hard_input_token_cap}"
+                
             )
 
         would_exceed_hard = current_tokens + tokens > hard_input_token_cap

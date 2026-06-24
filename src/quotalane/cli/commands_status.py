@@ -14,7 +14,9 @@ console = Console()
 
 
 def status(
-    db_path: Annotated[Path, typer.Option("--db", help="SQLite checkpoint database path.")] = DEFAULT_DB_PATH,
+    db_path: Annotated[
+        Path, typer.Option("--db", help="SQLite checkpoint database path.")
+    ] = DEFAULT_DB_PATH,
 ) -> None:
     repo = SQLiteRepository(db_path)
     jobs = [job for job in repo.list_jobs() if job is not None]

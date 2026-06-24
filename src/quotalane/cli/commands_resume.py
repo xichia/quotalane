@@ -16,11 +16,15 @@ console = Console()
 
 def resume(
     job_id: Annotated[str, typer.Argument(help="Job ID to resume.")],
-    config_path: Annotated[Path, typer.Option("--config", help="Path to the original YAML job config.")] = Path(
-        "examples/paragraph_summary_large_job.yaml"
-    ),
-    db_path: Annotated[Path, typer.Option("--db", help="SQLite checkpoint database path.")] = DEFAULT_DB_PATH,
-    no_windows: Annotated[bool, typer.Option("--no-windows", help="Hide dispatch-window details.")] = False,
+    config_path: Annotated[
+        Path, typer.Option("--config", help="Path to the original YAML job config.")
+    ] = Path("examples/paragraph_summary_large_job.yaml"),
+    db_path: Annotated[
+        Path, typer.Option("--db", help="SQLite checkpoint database path.")
+    ] = DEFAULT_DB_PATH,
+    no_windows: Annotated[
+        bool, typer.Option("--no-windows", help="Hide dispatch-window details.")
+    ] = False,
 ) -> None:
     config = load_job_config(config_path)
     if config.job_id != job_id:

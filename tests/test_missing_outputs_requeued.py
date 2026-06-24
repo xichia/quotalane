@@ -4,7 +4,9 @@ from quotalane.storage.repositories import SQLiteRepository
 
 def test_missing_outputs_requeued(small_config, db_path):
     config = small_config.model_copy(
-        update={"simulation": small_config.simulation.model_copy(update={"missing_output_ratio": 0.02})}
+        update={
+            "simulation": small_config.simulation.model_copy(update={"missing_output_ratio": 0.02})
+        }
     )
     run_simulation(config, db_path=db_path, reset=True)
     repo = SQLiteRepository(db_path)

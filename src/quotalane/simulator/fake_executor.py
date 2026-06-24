@@ -32,7 +32,10 @@ class FakeBatchExecutor:
         missing: list[str] = []
         completed: list[str] = []
         for item_id in batch.work_item_ids:
-            if self.config.missing_output_ratio > 0 and self._rng.random() < self.config.missing_output_ratio:
+            if (
+                self.config.missing_output_ratio > 0
+                and self._rng.random() < self.config.missing_output_ratio
+            ):
                 missing.append(item_id)
             else:
                 completed.append(item_id)

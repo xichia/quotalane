@@ -152,7 +152,9 @@ class SQLiteRepository:
             for row in rows
         ]
 
-    def update_work_statuses(self, job_id: str, statuses: dict[str, WorkStatus], increment_attempt: bool = False) -> None:
+    def update_work_statuses(
+        self, job_id: str, statuses: dict[str, WorkStatus], increment_attempt: bool = False
+    ) -> None:
         with self.connection() as conn:
             for work_item_id, status in statuses.items():
                 if increment_attempt:
@@ -237,7 +239,10 @@ class SQLiteRepository:
         with self.connection() as conn:
             conn.executemany(
                 """
-                INSERT INTO lanes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO lanes VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
                 ON CONFLICT(lane_id) DO UPDATE SET
                   state=excluded.state,
                   cooldown_until_window=excluded.cooldown_until_window,
@@ -325,10 +330,28 @@ class SQLiteRepository:
             conn.execute(
                 """
                 INSERT INTO batch_attempts
-                (batch_id, lane_id, attempt_number, virtual_window, status, error_code, input_tokens, created_at)
+                (
+                    batch_id,
+                    lane_id,
+                    attempt_number,
+                    virtual_window,
+                    status,
+                    error_code,
+                    input_tokens,
+                    created_at
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (batch_id, lane_id, attempt_number, virtual_window, status, error_code, input_tokens, _now()),
+                (
+                    batch_id,
+                    lane_id,
+                    attempt_number,
+                    virtual_window,
+                    status,
+                    error_code,
+                    input_tokens,
+                    _now(),
+                ),
             )
             conn.commit()
 
@@ -348,7 +371,16 @@ class SQLiteRepository:
             conn.execute(
                 """
                 INSERT INTO scheduler_events
-                (job_id, event_type, message, lane_id, batch_id, virtual_window, details_json, created_at)
+                (
+                    job_id,
+                    event_type,
+                    message,
+                    lane_id,
+                    batch_id,
+                    virtual_window,
+                    details_json,
+                    created_at
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (

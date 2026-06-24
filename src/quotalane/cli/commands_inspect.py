@@ -15,8 +15,12 @@ console = Console()
 
 def inspect(
     job_id: Annotated[str, typer.Argument(help="Job ID to inspect.")],
-    db_path: Annotated[Path, typer.Option("--db", help="SQLite checkpoint database path.")] = DEFAULT_DB_PATH,
-    limit_events: Annotated[int, typer.Option("--limit-events", help="Recent events to show.")] = 10,
+    db_path: Annotated[
+        Path, typer.Option("--db", help="SQLite checkpoint database path.")
+    ] = DEFAULT_DB_PATH,
+    limit_events: Annotated[
+        int, typer.Option("--limit-events", help="Recent events to show.")
+    ] = 10,
 ) -> None:
     repo = SQLiteRepository(db_path)
     job = repo.get_job(job_id)
