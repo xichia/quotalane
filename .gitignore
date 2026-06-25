@@ -10,3 +10,25 @@ dist/
 build/
 *.egg-info/
 .DS_Store
+
+# Local secrets
+.env
+.env.local
+.env.*.local
+# Local runtime artifacts
+.local/
+output/
+*.sqlite3
+*.db
+*.log
+# OS/editor metadata
+.vscode/
+.idea/
+# Python
+.mypy_cache/
+venv/
+# QuotaLane scheduler state
+checkpoints/
+runs/
+scheduler-state/
+reports/
