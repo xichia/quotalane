@@ -233,3 +233,7 @@ See [`docs/v0.1_tasks.md`](docs/v0.1_tasks.md) and [`docs/architecture.md`](docs
 ## Portfolio positioning
 
 QuotaLane demonstrates infrastructure for reliable AI workloads under real API constraints: multi-key parallelism, token-aware batching, rate-limit handling, retry/recovery, checkpointing, and clean service boundaries.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
